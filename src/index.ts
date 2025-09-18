@@ -34,17 +34,18 @@ export {
 } from './beacon'
 
 export {
-  // ID
+  // ID - Pipeline-only generation
   generate as generateChittyID,
-  generateLocal as generateLocalChittyID,
-  generateRemote as generateRemoteChittyID,
   validateRemote as validateChittyID,
   isValidChittyID,
   parseChittyID,
   verifySignature as verifyChittySignature,
   signData as signWithChittyID,
   getSessionContext,
-  setSessionContext
+  setSessionContext,
+  // Testing/internal only (deprecated)
+  generateLocal as generateLocalChittyID,
+  generateRemote as generateRemoteChittyID
 } from './id'
 
 export {

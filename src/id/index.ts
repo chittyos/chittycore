@@ -38,7 +38,8 @@ export function configure(customConfig: ChittyIDConfig): void {
 }
 
 /**
- * Generate a new ChittyID locally
+ * Generate a new ChittyID locally (DEPRECATED - for testing only)
+ * @deprecated Use generate() for production - requires pipeline authentication
  */
 export function generateLocal(): ChittyID {
   const chittyId: ChittyID = {
@@ -68,15 +69,20 @@ export function generateLocal(): ChittyID {
 
 /**
  * Generate a ChittyID via the ChittyID pipeline (requires authentication)
+ * Pipeline-only - no fallback to local generation
  */
 export async function generateRemote(metadata?: Record<string, any>): Promise<ChittyID> {
+  if (!config.apiKey) {
+    throw new Error('ChittyID generation requires API key authentication - no local generation available')
+  }
+
   try {
     // Use the new pipeline-only endpoint that requires proper authentication
     const response = await fetch(`${config.endpoint}/api/pipeline/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(config.apiKey && { 'Authorization': `Bearer ${config.apiKey}` })
+        'Authorization': `Bearer ${config.apiKey}`
       },
       body: JSON.stringify({
         metadata,
@@ -87,9 +93,12 @@ export async function generateRemote(metadata?: Record<string, any>): Promise<Ch
 
     if (!response.ok) {
       if (response.status === 401) {
-        throw new Error('ChittyID generation requires authentication - please provide API key')
+        throw new Error('ChittyID generation failed: Invalid or expired API key')
       }
-      throw new Error(`ChittyID pipeline error: ${response.status}`)
+      if (response.status === 403) {
+        throw new Error('ChittyID generation failed: Insufficient permissions')
+      }
+      throw new Error(`ChittyID pipeline error: ${response.status} - ${response.statusText}`)
     }
 
     const result = await response.json() as ChittyID
@@ -101,33 +110,22 @@ export async function generateRemote(metadata?: Record<string, any>): Promise<Ch
 
     return result
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    if (errorMessage.includes('requires authentication')) {
-      throw error // Don't fall back for auth errors
-    }
-    console.warn('[ChittyID] Pipeline unavailable, falling back to local generation')
-    return generateLocal()
+    // Re-throw all errors - no fallback in pipeline-only architecture
+    throw error
   }
 }
 
 /**
- * Generate a ChittyID (attempts pipeline, falls back to local)
- * For production use, configure with API key for authenticated pipeline access
+ * Generate a ChittyID via the authenticated pipeline
+ * Pipeline-only architecture - requires API key authentication
  */
 export async function generate(metadata?: Record<string, any>): Promise<ChittyID> {
-  if (config.endpoint) {
-    try {
-      return await generateRemote(metadata)
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      if (errorMessage.includes('requires authentication')) {
-        console.warn('[ChittyID] Pipeline requires authentication. Configure with API key for production use.')
-        console.warn('[ChittyID] Falling back to local generation for development.')
-      }
-      return generateLocal()
-    }
+  if (!config.endpoint) {
+    throw new Error('ChittyID service endpoint not configured - set CHITTY_ID_ENDPOINT')
   }
-  return generateLocal()
+
+  // Always use pipeline - no fallback
+  return await generateRemote(metadata)
 }
 
 /**
