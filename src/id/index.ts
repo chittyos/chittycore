@@ -20,6 +20,11 @@ export interface ChittyIDConfig {
   generateKeys?: boolean
 }
 
+// Extend globalThis to include session context
+declare global {
+  var chittySessionId: string | undefined
+}
+
 const DEFAULT_CONFIG: ChittyIDConfig = {
   endpoint: process.env.CHITTY_ID_ENDPOINT || 'https://id.chitty.cc',
   apiKey: process.env.CHITTY_ID_API_KEY,
@@ -62,36 +67,65 @@ export function generateLocal(): ChittyID {
 }
 
 /**
- * Generate a ChittyID via the ChittyID server
+ * Generate a ChittyID via the ChittyID pipeline (requires authentication)
  */
 export async function generateRemote(metadata?: Record<string, any>): Promise<ChittyID> {
   try {
-    const response = await fetch(`${config.endpoint}/api/generate`, {
+    // Use the new pipeline-only endpoint that requires proper authentication
+    const response = await fetch(`${config.endpoint}/api/pipeline/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...(config.apiKey && { 'Authorization': `Bearer ${config.apiKey}` })
       },
-      body: JSON.stringify({ metadata })
+      body: JSON.stringify({
+        metadata,
+        // Include session context for distributed sync
+        sessionId: globalThis.chittySessionId || undefined
+      })
     })
 
     if (!response.ok) {
-      throw new Error(`ChittyID server error: ${response.status}`)
+      if (response.status === 401) {
+        throw new Error('ChittyID generation requires authentication - please provide API key')
+      }
+      throw new Error(`ChittyID pipeline error: ${response.status}`)
     }
 
-    return await response.json() as ChittyID
+    const result = await response.json() as ChittyID
+
+    // Store session ID for cross-service sync if provided
+    if (result.metadata?.sessionId) {
+      globalThis.chittySessionId = result.metadata.sessionId
+    }
+
+    return result
   } catch (error) {
-    console.warn('[ChittyID] Server unavailable, falling back to local generation')
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    if (errorMessage.includes('requires authentication')) {
+      throw error // Don't fall back for auth errors
+    }
+    console.warn('[ChittyID] Pipeline unavailable, falling back to local generation')
     return generateLocal()
   }
 }
 
 /**
- * Generate a ChittyID (attempts remote, falls back to local)
+ * Generate a ChittyID (attempts pipeline, falls back to local)
+ * For production use, configure with API key for authenticated pipeline access
  */
 export async function generate(metadata?: Record<string, any>): Promise<ChittyID> {
-  if (config.endpoint && config.apiKey) {
-    return generateRemote(metadata)
+  if (config.endpoint) {
+    try {
+      return await generateRemote(metadata)
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      if (errorMessage.includes('requires authentication')) {
+        console.warn('[ChittyID] Pipeline requires authentication. Configure with API key for production use.')
+        console.warn('[ChittyID] Falling back to local generation for development.')
+      }
+      return generateLocal()
+    }
   }
   return generateLocal()
 }
@@ -144,13 +178,54 @@ export function parseChittyID(input: string): string | null {
   return null
 }
 
+/**
+ * Validate a ChittyID via the pipeline validation endpoint
+ */
+export async function validateRemote(chittyId: string): Promise<boolean> {
+  try {
+    const response = await fetch(`${config.endpoint}/api/validate/${chittyId}`, {
+      method: 'GET',
+      headers: {
+        ...(config.apiKey && { 'Authorization': `Bearer ${config.apiKey}` })
+      }
+    })
+
+    if (response.ok) {
+      const result = await response.json() as { valid: boolean }
+      return result.valid === true
+    }
+
+    return false
+  } catch (error) {
+    console.warn('[ChittyID] Validation service unavailable, using local validation')
+    return isValidChittyID(chittyId)
+  }
+}
+
+/**
+ * Get session context for distributed sync
+ */
+export function getSessionContext(): string | undefined {
+  return globalThis.chittySessionId
+}
+
+/**
+ * Set session context for distributed sync
+ */
+export function setSessionContext(sessionId: string): void {
+  globalThis.chittySessionId = sessionId
+}
+
 export default {
   configure,
   generate,
   generateLocal,
   generateRemote,
+  validateRemote,
   verifySignature,
   signData,
   isValidChittyID,
-  parseChittyID
+  parseChittyID,
+  getSessionContext,
+  setSessionContext
 }

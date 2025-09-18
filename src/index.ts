@@ -38,10 +38,13 @@ export {
   generate as generateChittyID,
   generateLocal as generateLocalChittyID,
   generateRemote as generateRemoteChittyID,
+  validateRemote as validateChittyID,
   isValidChittyID,
   parseChittyID,
   verifySignature as verifyChittySignature,
-  signData as signWithChittyID
+  signData as signWithChittyID,
+  getSessionContext,
+  setSessionContext
 } from './id'
 
 export {

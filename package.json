@@ -1,22 +1,55 @@
 {
   "name": "@chittyos/core",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "ChittyOS Core - Essential package with ID, auth, verification, beacon tracking, and brand components for all ChittyOS applications",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     },
-    "./beacon": "./dist/beacon/index.js",
-    "./auth": "./dist/auth/index.js",
-    "./id": "./dist/id/index.js",
-    "./verify": "./dist/verify/index.js",
-    "./brand": "./dist/brand/index.js",
-    "./canon": "./dist/canon/index.js",
-    "./registry": "./dist/registry/index.js",
-    "./chittychat": "./dist/chittychat/index.js"
+    "./beacon": {
+      "types": "./dist/beacon/index.d.ts",
+      "import": "./dist/beacon/index.mjs",
+      "require": "./dist/beacon/index.js"
+    },
+    "./auth": {
+      "types": "./dist/auth/index.d.ts",
+      "import": "./dist/auth/index.mjs",
+      "require": "./dist/auth/index.js"
+    },
+    "./id": {
+      "types": "./dist/id/index.d.ts",
+      "import": "./dist/id/index.mjs",
+      "require": "./dist/id/index.js"
+    },
+    "./verify": {
+      "types": "./dist/verify/index.d.ts",
+      "import": "./dist/verify/index.mjs",
+      "require": "./dist/verify/index.js"
+    },
+    "./brand": {
+      "types": "./dist/brand/index.d.ts",
+      "import": "./dist/brand/index.mjs",
+      "require": "./dist/brand/index.js"
+    },
+    "./canon": {
+      "types": "./dist/canon/index.d.ts",
+      "import": "./dist/canon/index.mjs",
+      "require": "./dist/canon/index.js"
+    },
+    "./registry": {
+      "types": "./dist/registry/index.d.ts",
+      "import": "./dist/registry/index.mjs",
+      "require": "./dist/registry/index.js"
+    },
+    "./chittychat": {
+      "types": "./dist/chittychat/index.d.ts",
+      "import": "./dist/chittychat/index.mjs",
+      "require": "./dist/chittychat/index.js"
+    }
   },
   "scripts": {
     "build": "tsup",
