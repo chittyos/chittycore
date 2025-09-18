@@ -38,46 +38,22 @@ export function configure(customConfig: ChittyIDConfig): void {
 }
 
 /**
- * Generate a new ChittyID locally (DEPRECATED - for testing only)
- * @deprecated Use generate() for production - requires pipeline authentication
+ * REMOVED: ChittyCore does not generate ChittyIDs locally
+ * All ChittyIDs must be requested from id.chitty.cc service
+ * Use generate() or requestChittyID() instead
  */
-export function generateLocal(): ChittyID {
-  const chittyId: ChittyID = {
-    id: `CID_${nanoid(21)}`,
-    trustLevel: 0,
-    createdAt: new Date().toISOString()
-  }
-
-  if (config.generateKeys) {
-    const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519', {
-      publicKeyEncoding: {
-        type: 'spki',
-        format: 'pem'
-      },
-      privateKeyEncoding: {
-        type: 'pkcs8',
-        format: 'pem'
-      }
-    })
-
-    chittyId.publicKey = publicKey
-    chittyId.privateKey = privateKey
-  }
-
-  return chittyId
-}
 
 /**
- * Generate a ChittyID via the ChittyID pipeline (requires authentication)
- * Pipeline-only - no fallback to local generation
+ * Request a ChittyID from the ChittyID service at id.chitty.cc
+ * ChittyCore does not generate IDs - it requests them from the service
  */
-export async function generateRemote(metadata?: Record<string, any>): Promise<ChittyID> {
+export async function requestChittyID(metadata?: Record<string, any>): Promise<ChittyID> {
   if (!config.apiKey) {
-    throw new Error('ChittyID generation requires API key authentication - no local generation available')
+    throw new Error('ChittyID request requires API key authentication to access id.chitty.cc service')
   }
 
   try {
-    // Use the new pipeline-only endpoint that requires proper authentication
+    // Request ChittyID from the id.chitty.cc service
     const response = await fetch(`${config.endpoint}/api/pipeline/generate`, {
       method: 'POST',
       headers: {
@@ -93,12 +69,12 @@ export async function generateRemote(metadata?: Record<string, any>): Promise<Ch
 
     if (!response.ok) {
       if (response.status === 401) {
-        throw new Error('ChittyID generation failed: Invalid or expired API key')
+        throw new Error('ChittyID request failed: Invalid or expired API key for id.chitty.cc')
       }
       if (response.status === 403) {
-        throw new Error('ChittyID generation failed: Insufficient permissions')
+        throw new Error('ChittyID request failed: Insufficient permissions for id.chitty.cc service')
       }
-      throw new Error(`ChittyID pipeline error: ${response.status} - ${response.statusText}`)
+      throw new Error(`ChittyID service error: ${response.status} - ${response.statusText}`)
     }
 
     const result = await response.json() as ChittyID
@@ -116,16 +92,16 @@ export async function generateRemote(metadata?: Record<string, any>): Promise<Ch
 }
 
 /**
- * Generate a ChittyID via the authenticated pipeline
- * Pipeline-only architecture - requires API key authentication
+ * Request a ChittyID from the id.chitty.cc service
+ * ChittyCore does not generate IDs - it requests them from the service
  */
 export async function generate(metadata?: Record<string, any>): Promise<ChittyID> {
   if (!config.endpoint) {
-    throw new Error('ChittyID service endpoint not configured - set CHITTY_ID_ENDPOINT')
+    throw new Error('ChittyID service endpoint not configured - set CHITTY_ID_ENDPOINT to id.chitty.cc')
   }
 
-  // Always use pipeline - no fallback
-  return await generateRemote(metadata)
+  // Request ChittyID from id.chitty.cc service
+  return await requestChittyID(metadata)
 }
 
 /**
@@ -217,8 +193,7 @@ export function setSessionContext(sessionId: string): void {
 export default {
   configure,
   generate,
-  generateLocal,
-  generateRemote,
+  requestChittyID,
   validateRemote,
   verifySignature,
   signData,

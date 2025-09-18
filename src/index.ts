@@ -3,7 +3,7 @@
  *
  * Provides:
  * - Beacon: Application tracking and monitoring
- * - ID: Identity generation and management
+ * - ID: ChittyID requesting from id.chitty.cc service
  * - Auth: Authentication and authorization
  * - Verify: Data verification and validation
  * - Brand: Consistent branding and theming
@@ -34,18 +34,16 @@ export {
 } from './beacon'
 
 export {
-  // ID - Pipeline-only generation
+  // ID - Request ChittyIDs from id.chitty.cc service
   generate as generateChittyID,
+  requestChittyID,
   validateRemote as validateChittyID,
   isValidChittyID,
   parseChittyID,
   verifySignature as verifyChittySignature,
   signData as signWithChittyID,
   getSessionContext,
-  setSessionContext,
-  // Testing/internal only (deprecated)
-  generateLocal as generateLocalChittyID,
-  generateRemote as generateRemoteChittyID
+  setSessionContext
 } from './id'
 
 export {
