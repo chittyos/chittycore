@@ -48,9 +48,9 @@ integrate_repo() {
         npm uninstall @chittyos/core 2>/dev/null || true
     fi
 
-    # Install ChittyCore (using local path for now)
+    # Install ChittyCore from NPM
     echo "  📝 Installing @chittyos/core..."
-    unset NODE_OPTIONS && npm install "file:$CHITTYCORE_PATH" --save
+    unset NODE_OPTIONS && npm install @chittyos/core --save --legacy-peer-deps
 
     # Find main entry file
     MAIN_FILE=""
