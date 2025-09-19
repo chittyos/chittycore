@@ -40,8 +40,35 @@ ChittyCore follows an **orchestrator pattern** where it doesn't implement functi
 
 ## Installation
 
+### NPM Package Manager
 ```bash
 npm install @chittyos/core
+```
+
+### CDN (Browser)
+```html
+<!-- Latest version -->
+<script src="https://unpkg.com/@chittyos/core@2.1.0/dist/index.js"></script>
+
+<!-- Or via jsDelivr -->
+<script src="https://cdn.jsdelivr.net/npm/@chittyos/core@2.1.0/dist/index.js"></script>
+
+<!-- ES Modules -->
+<script type="module">
+  import chittyCore from 'https://unpkg.com/@chittyos/core@2.1.0/dist/index.mjs'
+</script>
+```
+
+### Other Package Managers
+```bash
+# Yarn
+yarn add @chittyos/core
+
+# pnpm
+pnpm add @chittyos/core
+
+# Bun
+bun add @chittyos/core
 ```
 
 ## 📖 API Documentation
