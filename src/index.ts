@@ -20,9 +20,10 @@ import * as brand from './brand'
 import * as canon from './canon'
 import * as registry from './registry'
 import * as chittychat from './chittychat'
+import * as agents from './agents'
 
 // Re-export all modules
-export { beacon, id, auth, verify, brand, canon, registry, chittychat }
+export { beacon, id, auth, verify, brand, canon, registry, chittychat, agents }
 
 // Export individual functions for convenience
 export {
@@ -105,6 +106,22 @@ export {
   getChittyChat
 } from './chittychat'
 
+export {
+  // Agents
+  BaseAgent,
+  createTool,
+  createConfirmableTool,
+  createToolCategory,
+  params,
+  createJobResult,
+  queueJob,
+  systemPromptTemplates,
+  agentConfigTemplates,
+  createAgentManifest,
+  generateWranglerToml,
+  generatePackageJson
+} from './agents'
+
 // Export types
 export type {
   // Beacon types
@@ -160,6 +177,24 @@ export type {
   Message
 } from './chittychat'
 
+export type {
+  // Agent types
+  AgentConfig,
+  AgentContext,
+  AgentManifest,
+  AgentSettings,
+  AgentState,
+  ChatMessage,
+  ChatResponse,
+  ToolDefinition,
+  ToolCategory,
+  ToolParameter,
+  ToolResult,
+  ToolCall,
+  JobQueue,
+  PendingConfirmation
+} from './agents'
+
 // Default export with all modules
 export default {
   beacon,
@@ -169,7 +204,8 @@ export default {
   brand,
   canon,
   registry,
-  chittychat
+  chittychat,
+  agents
 }
 
 // Auto-initialize beacon on import (can be disabled with CHITTY_BEACON_DISABLED=true)
