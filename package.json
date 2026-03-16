@@ -84,7 +84,7 @@
   },
   "dependencies": {
     "eventemitter3": "^5.0.1",
-    "jose": "^5.2.0",
+    "jose": "^6.2.1",
     "nanoid": "^5.0.4",
     "zod": "^3.22.4"
   },
