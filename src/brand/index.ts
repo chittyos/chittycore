@@ -1,5 +1,6 @@
 /**
  * ChittyOS Brand - Branding and theming utilities
+ * @canon chittycanon://docs/tech/spec/brand-tokens
  */
 
 export interface BrandColors {
