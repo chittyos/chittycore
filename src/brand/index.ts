@@ -91,16 +91,16 @@ export const CHITTY_THEME: BrandTheme = {
 
 export const LOGO_MARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <defs>
-    <linearGradient id="chitty-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="chitty-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#6366f1"/>
       <stop offset="100%" style="stop-color:#8b5cf6"/>
     </linearGradient>
   </defs>
-  <rect width="100" height="100" rx="20" fill="url(#chitty-grad)"/>
+  <rect width="100" height="100" rx="20" fill="url(#chitty-mark-grad)"/>
   <text x="50" y="68" font-family="Syne,system-ui,sans-serif" font-size="50" font-weight="bold" fill="white" text-anchor="middle">C</text>
 </svg>`
 
-export const LOGO_WORDMARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 60">
+export const LOGO_WORDMARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 60">
   <defs>
     <linearGradient id="chitty-wm-grad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" style="stop-color:#6366f1"/>
@@ -121,7 +121,7 @@ export const BRAND_CONFIG = {
     mark: LOGO_MARK_SVG,
     wordmark: LOGO_WORDMARK_SVG,
   },
-  copyright: `© ${new Date().getFullYear()} ChittyOS. All rights reserved.`,
+  get copyright() { return `© ${new Date().getFullYear()} ChittyOS. All rights reserved.` },
   social: {
     github: 'https://github.com/chittyos',
     twitter: null as string | null,
@@ -133,7 +133,7 @@ export const BRAND_CONFIG = {
     docs: 'https://docs.chitty.cc',
     status: 'https://status.chitty.cc'
   }
-} as const
+}
 
 /**
  * Get CSS variables for theme colors
@@ -317,10 +317,10 @@ export function generateTailwindConfig(): object {
           }
         },
         fontFamily: {
-          'chitty-display': CHITTY_THEME.fonts.display.split(','),
-          'chitty-sans': CHITTY_THEME.fonts.sans.split(','),
-          'chitty-serif': CHITTY_THEME.fonts.serif.split(','),
-          'chitty-mono': CHITTY_THEME.fonts.mono.split(',')
+          'chitty-display': CHITTY_THEME.fonts.display.split(',').map(f => f.trim().replace(/^["']|["']$/g, '')),
+          'chitty-sans': CHITTY_THEME.fonts.sans.split(',').map(f => f.trim().replace(/^["']|["']$/g, '')),
+          'chitty-serif': CHITTY_THEME.fonts.serif.split(',').map(f => f.trim().replace(/^["']|["']$/g, '')),
+          'chitty-mono': CHITTY_THEME.fonts.mono.split(',').map(f => f.trim().replace(/^["']|["']$/g, '')),
         },
         borderRadius: {
           'chitty': CHITTY_THEME.radius
