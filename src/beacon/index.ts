@@ -41,7 +41,11 @@ export interface AppInfo {
 }
 
 const DEFAULT_CONFIG: BeaconConfig = {
-  endpoint: process.env.CHITTY_BEACON_ENDPOINT || 'https://beacon.chitty.cc',
+  // CHITTY_BEACON_ENDPOINT takes priority; BEACON_ENDPOINT is accepted as a
+  // transition alias for consumers already using the @chittycorp/app-beacon
+  // env var convention. Falls back to monitor.chitty.cc, the only deployed
+  // sink that accepts POST /track.
+  endpoint: process.env.CHITTY_BEACON_ENDPOINT || process.env.BEACON_ENDPOINT || 'https://monitor.chitty.cc',
   interval: parseInt(process.env.CHITTY_BEACON_INTERVAL || '') || 300000,
   enabled: process.env.CHITTY_BEACON_DISABLED !== 'true',
   silent: process.env.CHITTY_BEACON_VERBOSE !== 'true'
@@ -199,13 +203,13 @@ export async function sendBeacon(event: string, data?: any): Promise<void> {
       body: JSON.stringify(payload)
     })
 
-    if (!config.silent && !response.ok) {
-      console.log(`[ChittyBeacon] Response: ${response.status}`)
+    if (!response.ok) {
+      // Always warn on delivery failure — silent only suppresses info logs
+      console.warn(`[ChittyBeacon] Delivery failed: HTTP ${response.status} from ${config.endpoint}`)
     }
   } catch (error) {
-    if (!config.silent) {
-      console.log(`[ChittyBeacon] Error: ${(error as Error).message}`)
-    }
+    // Always warn on network errors regardless of silent mode
+    console.warn(`[ChittyBeacon] Delivery error: ${(error as Error).message}`)
   }
 }
 
