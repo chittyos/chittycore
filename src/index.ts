@@ -76,6 +76,8 @@ export {
   CHITTY_COLORS,
   CHITTY_THEME,
   BRAND_CONFIG,
+  LOGO_MARK_SVG,
+  LOGO_WORDMARK_SVG,
   ASCII_LOGO,
   getCSSVariables,
   generateStyleTag,

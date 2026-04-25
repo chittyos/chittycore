@@ -1,5 +1,6 @@
 /**
  * ChittyOS Brand - Branding and theming utilities
+ * @canon chittycanon://docs/tech/spec/brand-tokens
  */
 
 export interface BrandColors {
@@ -24,6 +25,7 @@ export interface BrandTheme {
     dark: BrandColors
   }
   fonts: {
+    display: string
     sans: string
     serif: string
     mono: string
@@ -40,32 +42,32 @@ export interface BrandTheme {
 
 export const CHITTY_COLORS = {
   light: {
-    primary: '#0F172A',
-    secondary: '#64748B',
-    accent: '#3B82F6',
+    primary: '#4F46E5',
+    secondary: '#6366F1',
+    accent: '#8B5CF6',
     background: '#FFFFFF',
-    foreground: '#0F172A',
-    muted: '#F1F5F9',
-    mutedForeground: '#64748B',
-    border: '#E2E8F0',
+    foreground: '#1E1B4B',
+    muted: '#EEF2FF',
+    mutedForeground: '#6B7280',
+    border: '#E0E7FF',
     destructive: '#EF4444',
     success: '#10B981',
     warning: '#F59E0B',
-    info: '#3B82F6'
+    info: '#6366F1'
   },
   dark: {
-    primary: '#F8FAFC',
-    secondary: '#94A3B8',
-    accent: '#60A5FA',
-    background: '#0F172A',
-    foreground: '#F8FAFC',
-    muted: '#1E293B',
-    mutedForeground: '#94A3B8',
-    border: '#334155',
+    primary: '#818CF8',
+    secondary: '#A5B4FC',
+    accent: '#C4B5FD',
+    background: '#0F0F1A',
+    foreground: '#F5F3FF',
+    muted: '#1E1B4B',
+    mutedForeground: '#A5B4FC',
+    border: '#312E81',
     destructive: '#F87171',
     success: '#34D399',
     warning: '#FBBF24',
-    info: '#60A5FA'
+    info: '#818CF8'
   }
 } as const
 
@@ -73,9 +75,10 @@ export const CHITTY_THEME: BrandTheme = {
   name: 'ChittyOS Default',
   colors: CHITTY_COLORS,
   fonts: {
-    sans: 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif',
+    display: '"Syne", system-ui, sans-serif',
+    sans: '"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif',
     serif: 'Georgia, Cambria, "Times New Roman", Times, serif',
-    mono: 'ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", monospace'
+    mono: '"JetBrains Mono", ui-monospace, "SF Mono", "Cascadia Mono", monospace'
   },
   radius: '0.5rem',
   spacing: {
@@ -87,16 +90,39 @@ export const CHITTY_THEME: BrandTheme = {
   }
 }
 
+export const LOGO_MARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="chitty-mark-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="20" fill="url(#chitty-mark-grad)"/>
+  <text x="50" y="68" font-family="Syne,system-ui,sans-serif" font-size="50" font-weight="bold" fill="white" text-anchor="middle">C</text>
+</svg>`
+
+export const LOGO_WORDMARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 60">
+  <defs>
+    <linearGradient id="chitty-wm-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+  </defs>
+  <rect width="48" height="48" rx="10" x="6" y="6" fill="url(#chitty-wm-grad)"/>
+  <text x="30" y="42" font-family="Syne,system-ui,sans-serif" font-size="30" font-weight="bold" fill="white" text-anchor="middle">C</text>
+  <text x="70" y="42" font-family="Syne,system-ui,sans-serif" font-size="32" font-weight="700" fill="currentColor">ChittyOS</text>
+</svg>`
+
 export const BRAND_CONFIG = {
   name: 'ChittyOS',
-  tagline: 'Intelligent Business Operating System',
-  description: 'Enterprise-grade distributed system for legal technology and business automation',
+  tagline: 'Making proof as frictionless as speech',
+  description: 'Trust infrastructure and intelligent operating system for verification, identity, and evidence',
   logo: {
     text: 'ChittyOS',
-    icon: '⚡',
-    svg: null as string | null
+    mark: LOGO_MARK_SVG,
+    wordmark: LOGO_WORDMARK_SVG,
   },
-  copyright: `© ${new Date().getFullYear()} ChittyOS. All rights reserved.`,
+  get copyright() { return `© ${new Date().getFullYear()} ChittyOS. All rights reserved.` },
   social: {
     github: 'https://github.com/chittyos',
     twitter: null as string | null,
@@ -108,7 +134,7 @@ export const BRAND_CONFIG = {
     docs: 'https://docs.chitty.cc',
     status: 'https://status.chitty.cc'
   }
-} as const
+}
 
 /**
  * Get CSS variables for theme colors
@@ -123,6 +149,7 @@ export function getCSSVariables(theme: 'light' | 'dark' = 'light'): string {
   }
 
   // Add font variables
+  vars.push(`--chitty-font-display: ${CHITTY_THEME.fonts.display};`)
   vars.push(`--chitty-font-sans: ${CHITTY_THEME.fonts.sans};`)
   vars.push(`--chitty-font-serif: ${CHITTY_THEME.fonts.serif};`)
   vars.push(`--chitty-font-mono: ${CHITTY_THEME.fonts.mono};`)
@@ -209,7 +236,7 @@ export function generateStyleTag(theme: 'light' | 'dark' = 'light'): string {
   .chitty-input:focus {
     outline: none;
     border-color: var(--chitty-accent);
-    box-shadow: 0 0 0 2px rgb(59 130 246 / 0.1);
+    box-shadow: 0 0 0 2px rgb(99 102 241 / 0.2);
   }
 
   .chitty-badge {
@@ -291,9 +318,10 @@ export function generateTailwindConfig(): object {
           }
         },
         fontFamily: {
-          'chitty-sans': CHITTY_THEME.fonts.sans.split(','),
-          'chitty-serif': CHITTY_THEME.fonts.serif.split(','),
-          'chitty-mono': CHITTY_THEME.fonts.mono.split(',')
+          'chitty-display': CHITTY_THEME.fonts.display.split(',').map(f => f.trim().replace(/^["']|["']$/g, '')),
+          'chitty-sans': CHITTY_THEME.fonts.sans.split(',').map(f => f.trim().replace(/^["']|["']$/g, '')),
+          'chitty-serif': CHITTY_THEME.fonts.serif.split(',').map(f => f.trim().replace(/^["']|["']$/g, '')),
+          'chitty-mono': CHITTY_THEME.fonts.mono.split(',').map(f => f.trim().replace(/^["']|["']$/g, '')),
         },
         borderRadius: {
           'chitty': CHITTY_THEME.radius
@@ -328,6 +356,8 @@ export default {
   CHITTY_COLORS,
   CHITTY_THEME,
   BRAND_CONFIG,
+  LOGO_MARK_SVG,
+  LOGO_WORDMARK_SVG,
   getCSSVariables,
   generateStyleTag,
   generateThemeProvider,
