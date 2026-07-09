@@ -224,7 +224,7 @@ export function generatePackageJson(
     type: 'module',
     scripts: {
       dev: 'wrangler dev',
-      deploy: 'wrangler deploy',
+      deploy: 'cf deploy',
       typecheck: 'tsc --noEmit',
     },
     dependencies: {
